@@ -12,7 +12,7 @@ Summary:	Berkeley DB database library for C
 Summary(pl):	Biblioteka C do obs³ugi baz Berkeley DB
 Name:		db%{mver}
 Version:	%{mver}.20
-Release:	1
+Release:	1.1
 Epoch:		0
 License:	Sleepycat public license (GPL-like, see LICENSE)
 Group:		Libraries
@@ -33,7 +33,7 @@ Obsoletes:	db4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %ifarch i586 i686 athlon pentium3 pentium4 %{x8664}
-%undefine	with_java	1
+%define	with_java	1
 %endif
 
 %description

@@ -1,6 +1,6 @@
 #
 # Conditional build:
-%bcond_without	java	# build db-java
+%bcond_with	java	# build db-java
 %bcond_without	tcl	# don't build Tcl bindings
 %bcond_with	pmutex	# use POSIX mutexes (only process-private with linuxthreads)
 %bcond_without	nptl	# don't use process-shared POSIX mutexes (NPTL provides full interface)
@@ -32,8 +32,8 @@ Provides:	db = %{version}-%{release}
 Obsoletes:	db4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%ifnarch %{ix86} %{x8664}
-%undefine	with_java
+%ifarch i586 i686 athlon pentium3 pentium4 %{x8664}
+%undefine	with_java	1
 %endif
 
 %description

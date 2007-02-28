@@ -19,6 +19,8 @@ Group:		Libraries
 # alternative site (sometimes working): http://www.berkeleydb.com/
 Source0:	http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
 # Source0-md5:	b0f1c777708cb8e9d37fb47e7ed3312d
+Patch0:		patch.4.5.20.1
+Patch1:		patch.4.5.20.2
 URL:		http://www.oracle.com/technology/products/berkeley-db/index.html
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -241,6 +243,8 @@ poleceń.
 
 %prep
 %setup -q -n db-%{version}
+%patch0 -p0
+%patch1 -p0
 
 %if !%{with nptl}
 sed -i -e 's,AM_PTHREADS_SHARED("POSIX/.*,:,' dist/aclocal/mutex.ac

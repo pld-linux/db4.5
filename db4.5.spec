@@ -1,16 +1,19 @@
 #
 # Conditional build:
-%bcond_without	java	# build db-java
-%bcond_without	tcl	# don't build Tcl bindings
-%bcond_with	pmutex	# use POSIX mutexes (only process-private with linuxthreads)
-%bcond_without	nptl	# don't use process-shared POSIX mutexes (NPTL provides full interface)
+%bcond_without	java		# don't build java bindings
+%bcond_without	tcl		# don't build Tcl bindings
+%bcond_with	pmutex		# use POSIX mutexes (only process-private with linuxthreads)
+%bcond_without	nptl		# don't use process-shared POSIX mutexes (NPTL provides full interface)
 %bcond_without	static_libs	# don't build static libraries
 #
 %{?with_nptl:%define	with_pmutex	1}
+%ifnarch i586 i686 athlon pentium3 pentium4 %{x8664}
+%undefine with_java
+%endif
 %define	mver	4.5
 Summary:	Berkeley DB database library for C
 Summary(pl.UTF-8):	Biblioteka C do obsługi baz Berkeley DB
-Name:		db%{mver}
+Name:		db4.5
 Version:	%{mver}.20
 Release:	3
 Epoch:		0
@@ -33,10 +36,6 @@ BuildRequires:	sed >= 4.0
 Provides:	db = %{version}-%{release}
 Obsoletes:	db4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%ifnarch i586 i686 athlon pentium3 pentium4 %{x8664}
-	%define with_java 0
-%endif
 
 %description
 The Berkeley Database (Berkeley DB) is a programmatic toolkit that

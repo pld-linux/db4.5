@@ -15,7 +15,7 @@ Summary:	Berkeley DB database library for C
 Summary(pl.UTF-8):	Biblioteka C do obsługi baz Berkeley DB
 Name:		db4.5
 Version:	%{mver}.20
-Release:	4
+Release:	5
 Epoch:		0
 License:	Sleepycat public license (GPL-like, see LICENSE)
 Group:		Libraries
@@ -24,6 +24,7 @@ Source0:	http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
 # Source0-md5:	b0f1c777708cb8e9d37fb47e7ed3312d
 Patch0:		patch.4.5.20.1
 Patch1:		patch.4.5.20.2
+Patch10:	db-rpm-robustness.patch
 URL:		http://www.oracle.com/technology/products/berkeley-db/index.html
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -244,6 +245,8 @@ poleceń.
 %setup -q -n db-%{version}
 %patch0 -p0
 %patch1 -p0
+
+%patch10 -p1
 
 %if !%{with nptl}
 sed -i -e 's,AM_PTHREADS_SHARED("POSIX/.*,:,' dist/aclocal/mutex.ac

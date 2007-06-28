@@ -5,6 +5,7 @@
 %bcond_with	pmutex		# use POSIX mutexes (only process-private with linuxthreads)
 %bcond_without	nptl		# don't use process-shared POSIX mutexes (NPTL provides full interface)
 %bcond_without	static_libs	# don't build static libraries
+%bcond_with	rpm_robustness
 #
 %{?with_nptl:%define	with_pmutex	1}
 %ifnarch i586 i686 athlon pentium3 pentium4 %{x8664}
@@ -35,7 +36,7 @@ BuildRequires:	libtool
 BuildRequires:	sed >= 4.0
 %{?with_tcl:BuildRequires:	tcl-devel >= 8.4.0}
 Provides:	db = %{version}-%{release}
-Requires:	uname(release) >= 2.6.17
+%{?with_rpm_robustness:Requires:	uname(release) >= 2.6.17}
 Obsoletes:	db4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -247,7 +248,7 @@ poleceń.
 %patch0 -p0
 %patch1 -p0
 
-%patch10 -p1
+%{?with_rpm_robustness:%patch10 -p1}
 
 %if !%{with nptl}
 sed -i -e 's,AM_PTHREADS_SHARED("POSIX/.*,:,' dist/aclocal/mutex.ac

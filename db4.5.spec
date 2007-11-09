@@ -16,7 +16,7 @@ Summary:	Berkeley DB database library for C
 Summary(pl.UTF-8):	Biblioteka C do obsługi baz Berkeley DB
 Name:		db4.5
 Version:	%{mver}.20
-Release:	7
+Release:	8
 Epoch:		0
 License:	Sleepycat public license (GPL-like, see LICENSE)
 Group:		Libraries

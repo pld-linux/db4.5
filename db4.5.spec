@@ -7,18 +7,23 @@
 %bcond_without	static_libs	# don't build static libraries
 #
 %{?with_nptl:%define	with_pmutex	1}
+%ifnarch i586 i686 athlon pentium3 pentium4 %{x8664}
+%undefine with_java
+%endif
 %define	mver	4.5
 Summary:	Berkeley DB database library for C
 Summary(pl.UTF-8):	Biblioteka C do obsługi baz Berkeley DB
-Name:		db%{mver}
+Name:		db4.5
 Version:	%{mver}.20
-Release:	3
+Release:	4
 Epoch:		0
 License:	Sleepycat public license (GPL-like, see LICENSE)
 Group:		Libraries
 # alternative site (sometimes working): http://www.berkeleydb.com/
 Source0:	http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
 # Source0-md5:	b0f1c777708cb8e9d37fb47e7ed3312d
+Patch0:		patch.4.5.20.1
+Patch1:		patch.4.5.20.2
 URL:		http://www.oracle.com/technology/products/berkeley-db/index.html
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -31,10 +36,6 @@ BuildRequires:	sed >= 4.0
 Provides:	db = %{version}-%{release}
 Obsoletes:	db4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%ifarch i586 i686 athlon pentium3 pentium4 %{x8664}
-%define	with_java	1
-%endif
 
 %description
 The Berkeley Database (Berkeley DB) is a programmatic toolkit that
@@ -156,7 +157,7 @@ Statyczna wersja biblioteki db-cxx.
 Summary:	Berkeley database library for Java
 Summary(pl.UTF-8):	Biblioteka baz danych Berkeley dla Javy
 Group:		Libraries
-Requires:	jre
+Requires:	jpackage-utils
 Provides:	db-java = %{version}-%{release}
 
 %description java
@@ -241,6 +242,8 @@ poleceń.
 
 %prep
 %setup -q -n db-%{version}
+%patch0 -p0
+%patch1 -p0
 
 %if !%{with nptl}
 sed -i -e 's,AM_PTHREADS_SHARED("POSIX/.*,:,' dist/aclocal/mutex.ac
@@ -263,7 +266,7 @@ CC="%{__cc}"
 CXX="%{__cxx}"
 CFLAGS="%{rpmcflags}"
 CXXFLAGS="%{rpmcflags} -fno-implicit-templates"
-LDFLAGS="%{rpmldflags}"
+LDFLAGS="%{rpmcflags} %{rpmldflags}"
 export CC CXX CFLAGS CXXFLAGS LDFLAGS
 
 ../dist/%configure \

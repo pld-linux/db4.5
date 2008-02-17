@@ -3,7 +3,7 @@
 %bcond_with	java	# build db-java
 %bcond_without	tcl	# don't build Tcl bindings
 %bcond_with	pmutex	# use POSIX mutexes (only process-private with linuxthreads)
-%bcond_without	nptl	# don't use process-shared POSIX mutexes (NPTL provides full interface)
+%bcond_with	nptl	# don't use process-shared POSIX mutexes (NPTL provides full interface)
 %bcond_without	static_libs	# don't build static libraries
 #
 %{?with_nptl:%define	with_pmutex	1}
@@ -15,7 +15,7 @@ Summary:	Berkeley DB database library for C
 Summary(pl.UTF-8):	Biblioteka C do obsługi baz Berkeley DB
 Name:		db4.5
 Version:	%{mver}.20
-Release:	4
+Release:	5
 Epoch:		0
 License:	Sleepycat public license (GPL-like, see LICENSE)
 Group:		Libraries

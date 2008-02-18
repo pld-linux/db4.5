@@ -299,7 +299,7 @@ cd build_unix
 	--%{?with_pmutex:en}%{!?with_pmutex:dis}able-posixmutexes \
 	--enable-cxx \
 	%{?with_tcl:--enable-tcl} \
-	%{?with_tcl:--with-tcl=/usr/lib} \
+	%{?with_tcl:--with-tcl=%{_libdir}} \
 	%{?with_java:--enable-java} \
 	--disable-static \
 	--enable-shared

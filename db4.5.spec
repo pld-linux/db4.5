@@ -15,7 +15,7 @@ Summary:	Berkeley DB database library for C
 Summary(pl.UTF-8):	Biblioteka C do obsługi baz Berkeley DB
 Name:		db4.5
 Version:	%{mver}.20
-Release:	5
+Release:	6
 Epoch:		0
 License:	Sleepycat public license (GPL-like, see LICENSE)
 Group:		Libraries
@@ -35,6 +35,7 @@ BuildRequires:	sed >= 4.0
 %{?with_tcl:BuildRequires:	tcl-devel >= 8.4.0}
 Provides:	db = %{version}-%{release}
 Obsoletes:	db4
+Conflicts:	rpm < 4.4.9-41
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -214,9 +215,8 @@ Summary(pl.UTF-8):	Narzędzia do obsługi baz Berkeley DB z linii poleceń
 Group:		Applications/Databases
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Provides:	db-utils = %{version}-%{release}
-Obsoletes:	db4-utils
-# obsolete Ra package
 Obsoletes:	db3-utils
+Obsoletes:	db4-utils
 
 %description utils
 The Berkeley Database (Berkeley DB) is a programmatic toolkit that
@@ -294,7 +294,7 @@ cd build_unix
 	--%{?with_pmutex:en}%{!?with_pmutex:dis}able-posixmutexes \
 	--enable-cxx \
 	%{?with_tcl:--enable-tcl} \
-	%{?with_tcl:--with-tcl=/usr/lib} \
+	%{?with_tcl:--with-tcl=%{_libdir}} \
 	%{?with_java:--enable-java} \
 	--disable-static \
 	--enable-shared

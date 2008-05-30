@@ -35,7 +35,6 @@ BuildRequires:	sed >= 4.0
 %{?with_tcl:BuildRequires:	tcl-devel >= 8.4.0}
 Provides:	db = %{version}-%{release}
 Obsoletes:	db4
-Conflicts:	rpm < 4.4.9-41
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description

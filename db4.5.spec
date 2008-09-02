@@ -16,22 +16,23 @@
 %ifnarch i586 i686 athlon pentium3 pentium4 %{x8664}
 %undefine with_java
 %endif
-%define	mver	4.5
+
+%define		mver		4.5
+%define		ver			%{mver}.20
+%define		patchlevel	2
 Summary:	Berkeley DB database library for C
 Summary(pl.UTF-8):	Biblioteka C do obsługi baz Berkeley DB
 Name:		db4.5
-Version:	%{mver}.20
-Release:	8
+Version:	%{ver}.%{patchlevel}
+Release:	1
 Epoch:		0
 License:	Sleepycat public license (GPL-like, see LICENSE)
 Group:		Libraries
-# alternative site (sometimes working): http://www.berkeleydb.com/
-Source0:	http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
+Source0:	http://download.oracle.com/berkeley-db/db-%{ver}.tar.gz
 # Source0-md5:	b0f1c777708cb8e9d37fb47e7ed3312d
-Patch0:		patch.4.5.20.1
-Patch1:		patch.4.5.20.2
-Patch10:	db-rpm-robustness.patch
-URL:		http://www.oracle.com/technology/products/berkeley-db/index.html
+%patchset_source -f http://www.oracle.com/technology/products/berkeley-db/db/update/%{ver}/patch.%{ver}.%g 1 %{patchlevel}
+Patch0:		db-rpm-robustness.patch
+URL:		http://www.oracle.com/technology/software/products/berkeley-db/db/index.html
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	ed
@@ -39,6 +40,7 @@ BuildRequires:	ed
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
 BuildRequires:	rpm >= 4.4.9-56
+BuildRequires:	rpmbuild(macros) >= 1.426
 BuildRequires:	sed >= 4.0
 %{?with_tcl:BuildRequires:	tcl-devel >= 8.4.0}
 %{?with_rpm_robustness:Requires:	uname(release) >= 2.6.17}
@@ -249,11 +251,12 @@ Ten pakiet zawiera narzędzia do obsługi baz Berkeley DB z linii
 poleceń.
 
 %prep
-%setup -q -n db-%{version}
-%patch0 -p0
-%patch1 -p0
+%setup -q -n db-%{ver}
 
-%{?with_rpm_robustness:%patch10 -p1}
+# official patches
+%patchset_patch 1 %{patchlevel}
+
+%{?with_rpm_robustness:%patch0 -p1}
 
 %if !%{with nptl}
 sed -i -e 's,AM_PTHREADS_SHARED("POSIX/.*,:,' dist/aclocal/mutex.ac
@@ -375,6 +378,12 @@ cp -rf examples_cxx/* $RPM_BUILD_ROOT%{_examplesdir}/db-cxx-%{version}
 %if %{with java}
 install -d $RPM_BUILD_ROOT%{_examplesdir}/db-java-%{version}
 cp -rf examples_java/* $RPM_BUILD_ROOT%{_examplesdir}/db-java-%{version}
+%else
+rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/java
+rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/collections
+rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/gsg/JAVA
+rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/gsg_txn/JAVA
+rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/gsg_db_rep/JAVA
 %endif
 
 %clean

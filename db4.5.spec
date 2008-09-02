@@ -1,9 +1,14 @@
 #
 # Conditional build:
+%if "%{pld_release}" == "ac"
+%bcond_with		java	# build db-java
+%bcond_with		nptl	# don't use process-shared POSIX mutexes (NPTL provides full interface)
+%else
 %bcond_without	java		# don't build java bindings
+%bcond_without	nptl		# don't use process-shared POSIX mutexes (NPTL provides full interface)
+%endif
 %bcond_without	tcl		# don't build Tcl bindings
 %bcond_with	pmutex		# use POSIX mutexes (only process-private with linuxthreads)
-%bcond_without	nptl		# don't use process-shared POSIX mutexes (NPTL provides full interface)
 %bcond_without	static_libs	# don't build static libraries
 %bcond_with	rpm_robustness
 #
@@ -33,10 +38,11 @@ BuildRequires:	ed
 %{?with_java:BuildRequires:	jdk}
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
+BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	sed >= 4.0
 %{?with_tcl:BuildRequires:	tcl-devel >= 8.4.0}
-Provides:	db = %{version}-%{release}
 %{?with_rpm_robustness:Requires:	uname(release) >= 2.6.17}
+Provides:	db = %{version}-%{release}
 Obsoletes:	db4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -217,9 +223,8 @@ Summary(pl.UTF-8):	Narzędzia do obsługi baz Berkeley DB z linii poleceń
 Group:		Applications/Databases
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Provides:	db-utils = %{version}-%{release}
-Obsoletes:	db4-utils
-# obsolete Ra package
 Obsoletes:	db3-utils
+Obsoletes:	db4-utils
 
 %description utils
 The Berkeley Database (Berkeley DB) is a programmatic toolkit that

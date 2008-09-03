@@ -44,6 +44,7 @@ BuildRequires:	rpmbuild(macros) >= 1.426
 BuildRequires:	sed >= 4.0
 %{?with_tcl:BuildRequires:	tcl-devel >= 8.4.0}
 %{?with_rpm_robustness:Requires:	uname(release) >= 2.6.17}
+%{?with_nptl:Requires:	uname(release) >= 2.6.0}
 Provides:	db = %{version}-%{release}
 Obsoletes:	db4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -258,7 +259,7 @@ poleceń.
 
 %{?with_rpm_robustness:%patch0 -p1}
 
-%if !%{with nptl}
+%if %{without nptl}
 sed -i -e 's,AM_PTHREADS_SHARED("POSIX/.*,:,' dist/aclocal/mutex.ac
 %endif
 

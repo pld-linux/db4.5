@@ -1,25 +1,26 @@
 #
 # Conditional build:
 %if "%{pld_release}" == "ac"
-%bcond_with		java	# build db-java
-%bcond_with		nptl	# don't use process-shared POSIX mutexes (NPTL provides full interface)
+%bcond_with	java		# build Java library
+%bcond_with	nptl		# use process-shared POSIX mutexes (NPTL provides full interface)
 %else
-%bcond_without	java		# don't build java bindings
+%bcond_without	java		# don't build Java library
 %bcond_without	nptl		# don't use process-shared POSIX mutexes (NPTL provides full interface)
 %endif
 %bcond_without	tcl		# don't build Tcl bindings
-%bcond_with	pmutex		# use POSIX mutexes (only process-private with linuxthreads)
+%bcond_with	pmutex		# use process-shared POSIX mutexes (not available with linuxthreads)
 %bcond_without	static_libs	# don't build static libraries
-%bcond_with	rpm_robustness
+%bcond_with	default_db	# use this db as default system db
+%bcond_with	rpm_robustness	# apply rpm-robustness patch (use robust mutexes)
 #
+%define		mver		4.5
+%define		ver		%{mver}.20
+%define		patchlevel	2
 %{?with_nptl:%define	with_pmutex	1}
 %ifnarch i586 i686 athlon pentium3 pentium4 %{x8664}
 %undefine with_java
 %endif
 
-%define		mver		4.5
-%define		ver			%{mver}.20
-%define		patchlevel	2
 Summary:	Berkeley DB database library for C
 Summary(pl.UTF-8):	Biblioteka C do obsługi baz Berkeley DB
 Name:		db4.5
@@ -28,11 +29,12 @@ Release:	1
 Epoch:		0
 License:	Sleepycat public license (GPL-like, see LICENSE)
 Group:		Libraries
+#Source0Download: http://www.oracle.com/technetwork/database/berkeleydb/downloads/index-082944.html
 Source0:	http://download.oracle.com/berkeley-db/db-%{ver}.tar.gz
 # Source0-md5:	b0f1c777708cb8e9d37fb47e7ed3312d
-%patchset_source -f http://www.oracle.com/technology/products/berkeley-db/db/update/%{ver}/patch.%{ver}.%g 1 %{patchlevel}
+%patchset_source -f http://download.oracle.com/berkeley-db/patches/db/%{ver}/patch.%{ver}.%g 1 %{patchlevel}
 Patch0:		db-rpm-robustness.patch
-URL:		http://www.oracle.com/technology/software/products/berkeley-db/db/index.html
+URL:		http://www.oracle.com/technetwork/database/berkeleydb/downloads/index.html
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	ed
@@ -253,7 +255,6 @@ poleceń.
 
 %prep
 %setup -q -n db-%{ver}
-
 # official patches
 %patchset_patch 1 %{patchlevel}
 
@@ -263,11 +264,17 @@ poleceń.
 sed -i -e 's,AM_PTHREADS_SHARED("POSIX/.*,:,' dist/aclocal/mutex.ac
 %endif
 
+sed -i -e '/AC_PROG_LIBTOOL/aLT_OUTPUT' dist/configure.ac
+
 %build
 cd dist
 cp -f /usr/share/aclocal/libtool.m4 aclocal/libtool.ac
+cp -f /usr/share/aclocal/ltoptions.m4 aclocal/ltoptions.ac
+cp -f /usr/share/aclocal/ltsugar.m4 aclocal/ltsugar.ac
+cp -f /usr/share/aclocal/ltversion.m4 aclocal/ltversion.ac
+cp -f /usr/share/aclocal/lt~obsolete.m4 aclocal/lt~obsolete.ac
 cp -f /usr/share/automake/config.sub .
-cp -f /usr/share/libtool/ltmain.sh .
+cp -f /usr/share/libtool/config/ltmain.sh .
 sh s_config
 cd ..
 
@@ -327,14 +334,14 @@ install -d $RPM_BUILD_ROOT%{_javadir}
 
 %if %{with static_libs}
 %{__make} -C build_unix.static library_install \
-	docdir=%{_docdir}/db-%{version}-docs \
-	DESTDIR=$RPM_BUILD_ROOT
+	DESTDIR=$RPM_BUILD_ROOT \
+	docdir=%{_docdir}/db-%{version}-docs
 %endif
 
 %{__make} -C build_unix library_install \
-	docdir=%{_docdir}/db-%{version}-docs \
 	DESTDIR=$RPM_BUILD_ROOT \
-	LIB_INSTALL_FILE_LIST=""
+	LIB_INSTALL_FILE_LIST="" \
+	docdir=%{_docdir}/db-%{version}-docs
 
 mv $RPM_BUILD_ROOT%{_libdir}/libdb-%{mver}.so $RPM_BUILD_ROOT/%{_lib}
 
@@ -380,11 +387,11 @@ cp -rf examples_cxx/* $RPM_BUILD_ROOT%{_examplesdir}/db-cxx-%{version}
 install -d $RPM_BUILD_ROOT%{_examplesdir}/db-java-%{version}
 cp -rf examples_java/* $RPM_BUILD_ROOT%{_examplesdir}/db-java-%{version}
 %else
-rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/java
-rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/collections
-rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/gsg/JAVA
-rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/gsg_txn/JAVA
-rm -rf $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/gsg_db_rep/JAVA
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/java
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/collections
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/gsg/JAVA
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/gsg_txn/JAVA
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/db-%{version}-docs/gsg_db_rep/JAVA
 %endif
 
 %clean
@@ -405,6 +412,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) /%{_lib}/libdb-%{mver}.so
 %dir %{_docdir}/db-%{version}-docs
 %{_docdir}/db-%{version}-docs/index.html
+%{_docdir}/db-%{version}-docs/license
 
 %files devel
 %defattr(644,root,root,755)

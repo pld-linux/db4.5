@@ -25,7 +25,7 @@ Summary:	Berkeley DB database library for C
 Summary(pl.UTF-8):	Biblioteka C do obsługi baz Berkeley DB
 Name:		db4.5
 Version:	%{ver}.%{patchlevel}
-Release:	1
+Release:	2
 Epoch:		0
 License:	Sleepycat public license (GPL-like, see LICENSE)
 Group:		Libraries
@@ -34,6 +34,7 @@ Source0:	http://download.oracle.com/berkeley-db/db-%{ver}.tar.gz
 # Source0-md5:	b0f1c777708cb8e9d37fb47e7ed3312d
 %patchset_source -f http://download.oracle.com/berkeley-db/patches/db/%{ver}/patch.%{ver}.%g 1 %{patchlevel}
 Patch0:		db-rpm-robustness.patch
+Patch1:		format-security.patch
 URL:		http://www.oracle.com/technetwork/database/berkeleydb/downloads/index.html
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -293,6 +294,7 @@ poleceń.
 %patchset_patch 1 %{patchlevel}
 
 %{?with_rpm_robustness:%patch0 -p1}
+%patch1 -p1
 
 %if %{without nptl}
 sed -i -e 's,AM_PTHREADS_SHARED("POSIX/.*,:,' dist/aclocal/mutex.ac
@@ -301,16 +303,7 @@ sed -i -e 's,AM_PTHREADS_SHARED("POSIX/.*,:,' dist/aclocal/mutex.ac
 sed -i -e '/AC_PROG_LIBTOOL/aLT_OUTPUT' dist/configure.ac
 
 %build
-cd dist
-cp -f /usr/share/aclocal/libtool.m4 aclocal/libtool.ac
-cp -f /usr/share/aclocal/ltoptions.m4 aclocal/ltoptions.ac
-cp -f /usr/share/aclocal/ltsugar.m4 aclocal/ltsugar.ac
-cp -f /usr/share/aclocal/ltversion.m4 aclocal/ltversion.ac
-cp -f /usr/share/aclocal/lt~obsolete.m4 aclocal/lt~obsolete.ac
-cp -f /usr/share/automake/config.sub .
-cp -f /usr/share/libtool/config/ltmain.sh .
-sh s_config
-cd ..
+cp -f /usr/share/automake/config.sub dist
 
 %if %{with static_libs}
 cp -a build_unix build_unix.static
